@@ -21,44 +21,46 @@ app.use(express.urlencoded({extended: true}));
 app.get("/", function (req, res) {
     res.sendFile(path.join(__dirname, "/public/index.html"));
 });
-
 app.get("/notes", function (req, res) {
     res.sendFile(path.join(__dirname, "/public/notes.html"));
 })
 
-// GET notes
-app.get("/api/notes", function (err, res) {
-    try {
-        createNoteData = fs.readFileSync("/Develop/db/db.json", "utf8");
-        console.log("Successful server contact!");
-        createNoteData = JSON.parse(createNoteData);
-    } catch (err) {
-        console.log("\n error (catch err app.get):");
-        console.log(err);
-    }
-    res.json(createNoteData);
-});
+// GET and POST requests
+app.route("/api/notes")
+    // GET the notes from the database
+    .get(function (req, res) {
+        res.json(database);
+    })
 
-// POST notes
-app.post("/api/notes", function (req, res) {
-    try {
-        createNoteData = fs.readFileSync("./Develop/db/db.json", "utf8");
-        console.log(createNoteData);
-        createNoteData = JSON.parse(createNoteData);
-        req.body.id = createNoteData.length;
-        createNoteData.push(req.body);
-        createNoteData = JSON.stringify(createNoteData);
-        fs.writeFile("./db/db.json", createNoteData, "utf8", function (err) {
-            if (err) throw err;
+    // POST a note to the database
+    .post(function (req, res) {
+        let jsonFilePath = path.join(__dirname, "/Develop/db/db.json");
+        let newNote = req.body;
+
+        // Allocate ID number to first note
+        let highestId = 99;
+        // Identifies note with highest ID number
+        for (let i = 0; i < database.length; i++) {
+            let individualNote = database[i];
+
+            if (individualNote.id > highestId) {
+                highestId = individualNote.id;
+            }
+        }
+        // New note has unique ID assigned
+        newNote.id = highestId + 1;
+        database.push(newNote)
+
+        // Write to db.json
+        fs.writeFile(jsonFilePath, JSON.stringify(database), function (err) {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("Your note was saved!");
         });
-  
-        res.json(JSON.parse(createNoteData));
-    } catch (err) {
-        throw err;
-        console.error(err);
-    }
+        // Gives back the response 
+        res.json(newNote);
 });
-  
 
 
 
