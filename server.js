@@ -62,9 +62,26 @@ app.route("/api/notes")
         res.json(newNote);
 });
 
-
-
-
+// Delete function using note unique ID
+app.delete("/api/notes/:id", function (req, res) {
+    let jsonFilePath = path.join(__dirname, "/Develop/db/db.json");
+    for (let i = 0; i < database.length; i++) {
+        if (database[i].id == req.params.id) {
+            // Splice out note
+            database.splice(i, 1);
+            break;
+        }
+    }
+    // Rewrite to database file again
+    fs.writeFileSync(jsonFilePath, JSON.stringify(database), function (err) {
+        if (err) {
+            return console.log(err);
+        } else {
+            console.log("Your note was deleted!");
+        }
+    });
+    res.json(database);
+});
 
 
 // Server listening to port
