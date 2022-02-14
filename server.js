@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Access to public directory
-app.use(express.static('public'));
+app.use(express.static('Develop/public'));
 
 // Middleware
 app.use(express.json());
@@ -19,10 +19,10 @@ app.use(express.urlencoded({extended: true}));
 
 // Setting up page routes
 app.get("/", function (req, res) {
-    res.sendFile(path.join(__dirname, "/public/index.html"));
+    res.sendFile(path.join(__dirname, "/Develop/public/index.html"));
 });
 app.get("/notes", function (req, res) {
-    res.sendFile(path.join(__dirname, "/public/notes.html"));
+    res.sendFile(path.join(__dirname, "/Develop/public/notes.html"));
 })
 
 // GET and POST requests
